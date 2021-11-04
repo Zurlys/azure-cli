@@ -11,9 +11,9 @@ import random
 import string
 import test_data
 import generate_index
-from knack.log import get_logger
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 SENDGRID_KEY = sys.argv[1]
 BUILD_ID = sys.argv[2]
