@@ -68,10 +68,10 @@ def main():
         logger.exception(traceback.format_exc())
 
     # Write database
-    # try:
-    #     write_db(container, testdata)
-    # except Exception:
-    #     logger.exception(traceback.format_exc())
+    try:
+        write_db(container, testdata)
+    except Exception:
+        logger.exception(traceback.format_exc())
 
     logger.warning('Exit main()')
 
@@ -147,7 +147,11 @@ def write_db(container, testdata):
     cnx = mysql.connector.connect(user='fey@clisqldbserver',
                                   password=DB_PWD,
                                   host='clisqldbserver.mysql.database.azure.com',
-                                  database='clidb')
+                                  port=3306,
+                                  database='clidb',
+                                  # ssl_ca={ca - certfilename},
+                                  ssl_verify_cert = true,
+    )
     cursor = cnx.cursor()
     sql = 'INSERT INTO t1 (repr, repo, branch, commit, target, live, user, pass, fail, rate, detail, container, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
     repr = container
