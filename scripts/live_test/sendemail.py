@@ -3,15 +3,17 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-import sys
-import os
-import traceback
 import datetime
-import random
-import string
-import test_data
 import generate_index
 import logging
+import os
+import random
+import signal
+import string
+import sys
+import test_data
+import threading
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +116,41 @@ def upload_files(container):
     logger.warning('Exit upload_files()')
 
 
+class TimeoutError(Exception):
+    def __init__(self, msg):
+        super(TimeoutError, self).__init__()
+        self.msg = msg
+
+
+def time_out(interval):
+    def decorator(func):
+        def handler(signum, frame):
+            raise TimeoutError("run func {} timeout".format(func.__name__))
+
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, handler)
+            signal.alarm(interval)
+            result = func(*args, **kwargs)
+            signal.alarm(0)
+            return result
+        return wrapper
+
+    return decorator
+
+
+@time_out(10)
+def connect_db():
+    import mysql.connector
+    cnx = mysql.connector.connect(user='fey@clisqldbserver',
+                                  password=DB_PWD,
+                                  host='clisqldbserver.mysql.database.azure.com',
+                                  port=3306,
+                                  database='clidb',
+                                  connection_timeout=30,
+                                  )
+    return cnx
+
+
 def write_db(container, testdata):
     """
     Insert data to database.
@@ -140,21 +177,16 @@ def write_db(container, testdata):
     );
     """
     logger.warning('Enter write_db()')
-    logger.warning(f'container {container}')
-    logger.warning(f'testdata {testdata}')
-
-    import mysql.connector
+    logger.warning('container {}'.format(container))
+    logger.warning('testdata {}'.format(testdata))
     logger.warning('Connect DB...')
     # Connect
-    cnx = mysql.connector.connect(user='fey@clisqldbserver',
-                                  password=DB_PWD,
-                                  host='clisqldbserver.mysql.database.azure.com',
-                                  port=3306,
-                                  database='clidb',
-                                  connection_timeout=30,
-    )
-    logger.warning(cnx)
-    logger.warning(cnx is None)
+    import threading
+    t = threading.Thread(target=connect_db)
+    t.setDaemon(True)
+    t.start()
+    t.join(30)
+    cnx = connect_db
     logger.warning('Connect DB Success')
     cursor = cnx.cursor()
     sql = 'INSERT INTO t1 (repr, repo, branch, commit, target, live, user, pass, fail, rate, detail, container, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
