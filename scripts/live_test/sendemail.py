@@ -11,7 +11,9 @@ import random
 import string
 import test_data
 import generate_index
+from knack.log import get_logger
 
+logger = get_logger(__name__)
 
 SENDGRID_KEY = sys.argv[1]
 BUILD_ID = sys.argv[2]
@@ -27,6 +29,7 @@ DB_PWD = sys.argv[11]
 
 
 def main():
+    logger.warning('Enter main()')
     print('Enter main()')
 
     print(sys.argv)

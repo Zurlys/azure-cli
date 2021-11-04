@@ -479,6 +479,7 @@ jobs:
         az login -u azureclitest@azuresdkteam.onmicrosoft.com -p $(AZURECLITESTPASSWORD)
         echo 10
         az account set -s 0b1f6471-1bf0-4dda-aec3-cb9272f09590
+        az account show
         echo 11
         echo $(SENDGRID_KEY)
         echo $(Build.BuildId)
