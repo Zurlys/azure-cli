@@ -30,29 +30,28 @@ DB_PWD = sys.argv[11]
 
 def main():
     logger.warning('Enter main()')
-    print('Enter main()')
 
-    print(sys.argv)
-    print(SENDGRID_KEY)
-    print(BUILD_ID)
-    print(USER_REPO)
-    print(USER_BRANCH)
-    print(USER_TARGET)
-    print(USER_LIVE)
-    print(ARTIFACT_DIR)
-    print(REQUESTED_FOR_EMAIL)
-    print(ACCOUNT_KEY)
-    print(COMMIT_ID)
-    print(DB_PWD)
+    logger.warning(sys.argv)
+    logger.warning(SENDGRID_KEY)
+    logger.warning(BUILD_ID)
+    logger.warning(USER_REPO)
+    logger.warning(USER_BRANCH)
+    logger.warning(USER_TARGET)
+    logger.warning(USER_LIVE)
+    logger.warning(ARTIFACT_DIR)
+    logger.warning(REQUESTED_FOR_EMAIL)
+    logger.warning(ACCOUNT_KEY)
+    logger.warning(COMMIT_ID)
+    logger.warning(DB_PWD)
 
     # Upload results to storage account, container
     container = ''
     try:
-        print('Uploading test results to storage account...')
+        logger.warning('Uploading test results to storage account...')
         container = get_container_name()
         upload_files(container)
     except Exception:
-        print(traceback.format_exc())
+        logger.exception(traceback.format_exc())
 
     # Collect statistics
     testdata = test_data.TestData(ARTIFACT_DIR)
@@ -66,15 +65,15 @@ def main():
         # Send email
         send_email(html_content)
     except Exception:
-        print(traceback.format_exc())
+        logger.exception(traceback.format_exc())
 
     # Write database
     try:
         write_db(container, testdata)
     except Exception:
-        print(traceback.format_exc())
+        logger.exception(traceback.format_exc())
 
-    print('Exit main()')
+    logger.warning('Exit main()')
 
 
 def get_container_name():
@@ -82,11 +81,11 @@ def get_container_name():
     Generate container name in storage account. It is also an identifier of the pipeline run.
     :return:
     """
-    print('Enter get_container_name()')
+    logger.warning('Enter get_container_name()')
     time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     random_id = ''.join(random.choice(string.digits) for _ in range(6))
     name = time + '-' + random_id
-    print('Exit get_container_name()')
+    logger.warning('Exit get_container_name()')
     return name
 
 
@@ -96,7 +95,7 @@ def upload_files(container):
     :param container:
     :return:
     """
-    print('Enter upload_files()')
+    logger.warning('Enter upload_files()')
 
     # Create container
     cmd = 'az storage container create -n {} --account-name clitestresultstac --account-key {} --public-access container'.format(container, ACCOUNT_KEY)
@@ -109,10 +108,10 @@ def upload_files(container):
                 fullpath = os.path.join(root, name)
                 cmd = 'az storage blob upload -f {} -c {} -n {} --account-name clitestresultstac'
                 cmd = cmd.format(fullpath, container, name)
-                print('Running: ' + cmd)
+                logger.warning('Running: ' + cmd)
                 os.system(cmd)
 
-    print('Exit upload_files()')
+    logger.warning('Exit upload_files()')
 
 
 def write_db(container, testdata):
@@ -140,10 +139,10 @@ def write_db(container, testdata):
       UNIQUE KEY `repr` (`repr`)
     );
     """
-    print('Enter write_db()')
+    logger.warning('Enter write_db()')
 
     import mysql.connector
-    print('Writing DB...')
+    logger.warning('Writing DB...')
     # Connect
     cnx = mysql.connector.connect(user='fey@clisqldbserver',
                                   password=DB_PWD,
@@ -167,8 +166,8 @@ def write_db(container, testdata):
     date = terms[0]
     time = terms[1]
     data = (repr, repo, branch, commit, target, live, user, pass0, fail, rate, detail, container_url, date, time)
-    print(sql)
-    print(data)
+    logger.warning(sql)
+    logger.warning(data)
     cursor.execute(sql, data)
 
     # Make sure data is committed to the database
@@ -184,8 +183,8 @@ def write_db(container, testdata):
         for module, passed, failed, rate in testdata.modules:
             sql = 'INSERT INTO t2 (module, pass, fail, rate, ref_id) VALUES (%s, %s, %s, %s, %s)'
             data = (module, passed, failed, rate, id0)
-            print(sql)
-            print(data)
+            logger.warning(sql)
+            logger.warning(data)
             cursor.execute(sql, data)
         cnx.commit()
 
@@ -193,14 +192,14 @@ def write_db(container, testdata):
     cursor.close()
     cnx.close()
 
-    print('Exit write_db()')
+    logger.warning('Exit write_db()')
 
 
 def send_email(html_content):
-    print('Enter send_email()')
+    logger.warning('Enter send_email()')
 
     from sendgrid import SendGridAPIClient
-    print('Sending email...')
+    logger.warning('Sending email...')
     # message = Mail(
     #     from_email='azclibot@microsoft.com',
     #     to_emails='AzPyCLI@microsoft.com',
@@ -228,16 +227,16 @@ def send_email(html_content):
     if USER_TARGET == '' and USER_REPO == 'https://github.com/Azure/azure-cli.git' and USER_BRANCH == 'dev' and USER_LIVE == '--live' and REQUESTED_FOR_EMAIL == '':
         data['personalizations'][0]['to'].append({'email': 'AzPyCLI@microsoft.com'})
         data['personalizations'][0]['to'].append({'email': 'antcliTest@microsoft.com'})
-    # print(data)
+    logger.warning(data)
 
     sendgrid_key = sys.argv[1]
     sg = SendGridAPIClient(sendgrid_key)
     response = sg.send(data)
-    print(response.status_code)
-    print(response.body)
-    print(response.headers)
+    logger.warning(response.status_code)
+    logger.warning(response.body)
+    logger.warning(response.headers)
 
-    print('Exit send_email()')
+    logger.warning('Exit send_email()')
 
 
 def get_content(container, testdata):
@@ -245,7 +244,7 @@ def get_content(container, testdata):
     Compose content of email
     :return:
     """
-    print('Enter get_content()')
+    logger.warning('Enter get_content()')
 
     content = """
     <!DOCTYPE html>
@@ -328,8 +327,8 @@ def get_content(container, testdata):
     </html>
     """
 
-    print(content)
-    print('Exit get_content()')
+    logger.warning(content)
+    logger.warning('Exit get_content()')
     return content
 
 

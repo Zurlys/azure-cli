@@ -457,49 +457,25 @@ jobs:
         downloadPath: '$(System.ArtifactsDirectory)'
     - bash: |
         set -o errexit
-        echo 1
         echo $(System.ArtifactsDirectory)
-        echo 2
         ls $(System.ArtifactsDirectory)
-        echo 3
         pwd
-        echo 4
         commit_id=`git ls-remote https://github.com/Azure/azure-cli.git HEAD`
-        echo 5
         pip install sendgrid
-        echo 6
         pip install mysql-connector-python
-        echo 7
         pip install requests
-        echo 8
         # pip install certifi
         # Send notification
         az -v
-        echo 9
         az login -u azureclitest@azuresdkteam.onmicrosoft.com -p $(AZURECLITESTPASSWORD)
-        echo 10
         az account set -s 0b1f6471-1bf0-4dda-aec3-cb9272f09590
         az account show
-        echo 11
-        echo $(SENDGRID_KEY)
-        echo $(Build.BuildId)
-        echo $(USER_REPO)
-        echo $(USER_BRANCH)
-        echo $(USER_TARGET)
-        echo $(USER_LIVE)
-        echo $(System.ArtifactsDirectory)
-        echo $(Build.RequestedForEmail)
-        echo $(ACCOUNT_KEY)
-        echo $commit_id
-        echo $(DB_PWD)
         python /home/vsts/work/1/s/scripts/live_test/sendemail.py "$(SENDGRID_KEY)" "$(Build.BuildId)" "$(USER_REPO)" "$(USER_BRANCH)" "$(USER_TARGET)" "$(USER_LIVE)" "$(System.ArtifactsDirectory)" "$(Build.RequestedForEmail)" "$(ACCOUNT_KEY)" "$commit_id" "$(DB_PWD)"
-        echo 12
         # python /home/vsts/work/1/s/scripts/live_test/upload.py "$(System.ArtifactsDirectory)" "$(ACCOUNT_KEY)" "$(USER_LIVE)"
         # Clean resources
         if [[ "$(USER_LIVE)" == "--live" && "$(USER_TARGET)" == "" ]]; then
           python /home/vsts/work/1/s/scripts/live_test/clean.py
         fi
-        echo 13
 #    - task: AzureCLI@2
 #      inputs:
 #        azureSubscription: 'AzureSDKTest(0b1f6471-1bf0-4dda-aec3-cb9272f09590)'
