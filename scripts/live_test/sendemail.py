@@ -181,12 +181,7 @@ def write_db(container, testdata):
     logger.warning('testdata {}'.format(testdata))
     logger.warning('Connect DB...')
     # Connect
-    import threading
-    t = threading.Thread(target=connect_db)
-    t.setDaemon(True)
-    t.start()
-    t.join(30)
-    cnx = connect_db
+    cnx = connect_db()
     logger.warning('Connect DB Success')
     cursor = cnx.cursor()
     sql = 'INSERT INTO t1 (repr, repo, branch, commit, target, live, user, pass, fail, rate, detail, container, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
