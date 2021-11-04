@@ -26,8 +26,8 @@ jobs:
   strategy:
     maxParallel: 5
     matrix:
-      acr:
-        Target: acr
+#      acr:
+#        Target: acr
 #      acs:
 #        Target: acs
 #      advisor:
@@ -178,8 +178,8 @@ jobs:
 #        Target: ext-azure-firewall
 #      ext-azure-iot:
 #        Target: ext-azure-iot
-#      ext-blockchain:
-#        Target: ext-blockchain
+      ext-blockchain:
+        Target: ext-blockchain
 #      ext-blueprint:
 #        Target: ext-blueprint
 #      ext-codespaces:
@@ -456,6 +456,7 @@ jobs:
         downloadType: 'specific'
         downloadPath: '$(System.ArtifactsDirectory)'
     - bash: |
+        set -o errexit
         echo 1
         echo $(System.ArtifactsDirectory)
         echo 2
