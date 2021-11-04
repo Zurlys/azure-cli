@@ -140,20 +140,21 @@ def write_db(container, testdata):
     );
     """
     logger.warning('Enter write_db()')
+    logger.warning(f'container {container}')
+    logger.warning(f'testdata {testdata}')
 
     import mysql.connector
-    logger.warning('Writing DB...')
+    logger.warning('Connect DB...')
     # Connect
     cnx = mysql.connector.connect(user='fey@clisqldbserver',
                                   password=DB_PWD,
                                   host='clisqldbserver.mysql.database.azure.com',
                                   port=3306,
                                   database='clidb',
-                                  # ssl_ca={ca - certfilename},
-                                  # ssl_verify_cert = True,
     )
     cursor = cnx.cursor()
     sql = 'INSERT INTO t1 (repr, repo, branch, commit, target, live, user, pass, fail, rate, detail, container, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
+    logger.warning(sql)
     repr = container
     repo = USER_REPO
     branch = USER_BRANCH
@@ -170,7 +171,6 @@ def write_db(container, testdata):
     date = terms[0]
     time = terms[1]
     data = (repr, repo, branch, commit, target, live, user, pass0, fail, rate, detail, container_url, date, time)
-    logger.warning(sql)
     logger.warning(data)
     cursor.execute(sql, data)
 
