@@ -152,6 +152,7 @@ def write_db(container, testdata):
                                   port=3306,
                                   database='clidb',
     )
+    logger.warning('Connect DB Success')
     cursor = cnx.cursor()
     sql = 'INSERT INTO t1 (repr, repo, branch, commit, target, live, user, pass, fail, rate, detail, container, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
     logger.warning(sql)
