@@ -150,7 +150,7 @@ def write_db(container, testdata):
                                   port=3306,
                                   database='clidb',
                                   # ssl_ca={ca - certfilename},
-                                  ssl_verify_cert = true,
+                                  # ssl_verify_cert = True,
     )
     cursor = cnx.cursor()
     sql = 'INSERT INTO t1 (repr, repo, branch, commit, target, live, user, pass, fail, rate, detail, container, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
