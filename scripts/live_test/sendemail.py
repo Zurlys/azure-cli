@@ -151,7 +151,10 @@ def write_db(container, testdata):
                                   host='clisqldbserver.mysql.database.azure.com',
                                   port=3306,
                                   database='clidb',
+                                  connection_timeout=30,
     )
+    logger.warning(cnx)
+    logger.warning(cnx is None)
     logger.warning('Connect DB Success')
     cursor = cnx.cursor()
     sql = 'INSERT INTO t1 (repr, repo, branch, commit, target, live, user, pass, fail, rate, detail, container, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
